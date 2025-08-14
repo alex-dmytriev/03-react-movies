@@ -17,7 +17,6 @@ const fetchMovies = async (query: string): Promise<TmdbResponse> => {
   };
 
   const response = await axios.get<TmdbResponse>(baseURL, config);
-
   return response.data;
 };
 
