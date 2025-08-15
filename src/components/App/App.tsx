@@ -4,29 +4,34 @@ import fetchMovies from "../../services/movieServices";
 import SearchBar from "../SearchBar/SearchBar";
 import Loader from "../Loader/Loader";
 import { type Movie } from "../../types/movie";
+import MovieGrid from "../MovieGrid/MovieGrid";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import MovieModal from "../MovieModal/MovieModal";
 
 const App = () => {
+  //=== States ===
   const [query, setQuery] = useState<string>("");
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loader, setLoader] = useState<boolean>(false);
-  // const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<boolean | null>(false);
+  const [clickedMovie, setClickedMovie] = useState<Movie | null>(null);
 
+  //=== Handlers ===
   const handleSearch = (searchTerm: string) => {
     setQuery(searchTerm);
   };
 
+  //=== Effects ===
   useEffect(() => {
     // First mount blank query check
     if (!query) {
       return;
     }
 
-    console.log(movies); //
-
     const getMovies = async (): Promise<void> => {
       try {
         setLoader(true);
-        //TODO: setError state to null - there's no error yet
+        setError(false);
 
         const resultData = await fetchMovies(query);
         // Check if the resut is an empty array
@@ -34,9 +39,9 @@ const App = () => {
           toast.error("No movies found for your request");
           return;
         }
-        console.log(resultData.results); //TODO: add further logic
-      } catch (error) {
-        toast.error(`Something went wrong, try again later. Error: ${error}`);
+        setMovies(resultData.results);
+      } catch {
+        setError(true);
       } finally {
         setLoader(false);
       }
@@ -53,8 +58,19 @@ const App = () => {
   return (
     <>
       <SearchBar onSearch={handleSearch} />
-      <Toaster position="top-right" reverseOrder={false} />
-      {loader ? <Loader /> : null}
+      <Toaster position="top-center" reverseOrder={false} />
+      {loader && <Loader />}
+      {error && <ErrorMessage />}
+      {!error && movies.length !== 0 && (
+        <MovieGrid movies={movies} onSelect={setClickedMovie} />
+      )}
+
+      {clickedMovie && (
+        <MovieModal
+          movie={clickedMovie}
+          onClose={() => setClickedMovie(null)}
+        />
+      )}
     </>
   );
 };
