@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import css from "./MovieModal.module.css";
 import { type Movie } from "../../types/movie";
@@ -10,6 +11,29 @@ interface MovieModalProps {
 const modalRoot = document.getElementById("modal-root") as HTMLElement;
 
 const MovieModal = ({ movie, onClose }: MovieModalProps) => {
+  // Escape closure handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose]);
+
+  // Add temp class to prevent backdrop scrolling
+  useEffect(() => {
+    document.body.classList.add(css.noScroll);
+    return () => {
+      document.body.classList.remove(css.noScroll);
+    };
+  });
+
   return createPortal(
     <div
       onClick={onClose}
