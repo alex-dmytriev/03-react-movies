@@ -13,7 +13,7 @@ const App = () => {
   const [query, setQuery] = useState<string>("");
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loader, setLoader] = useState<boolean>(false);
-  const [error, setError] = useState<boolean | null>(false);
+  const [error, setError] = useState<boolean>(false);
   const [clickedMovie, setClickedMovie] = useState<Movie | null>(null);
 
   //=== Handlers ===
@@ -57,7 +57,7 @@ const App = () => {
 
   return (
     <>
-      <SearchBar onSearch={handleSearch} />
+      <SearchBar onSubmit={handleSearch} />
       <Toaster position="top-center" reverseOrder={false} />
       {loader && <Loader />}
       {error && <ErrorMessage />}
